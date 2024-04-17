@@ -87,23 +87,31 @@ def loopthread(message,otherss=False):
             app.delete_messages(message.chat.id,[msg.id])
             return
         except: pass
-
-    try: 
-        final = []
-        tmp = ""
-        for ele in links.split("\n"):
-            tmp += ele + "\n"
-            if len(tmp) > 4000:
-                final.append(tmp)
-                tmp = ""
-        final.append(tmp)
-        app.delete_messages(message.chat.id, msg.id)
-        tmsgid = message.id
-        for ele in final:
-            tmsg = app.send_message(message.chat.id, f'__{ele}__',reply_to_message_id=tmsgid, disable_web_page_preview=True)
-            tmsgid = tmsg.id
-    except Exception as e:
-        app.send_message(message.chat.id, f"__Failed to Bypass : {e}__", reply_to_message_id=message.id)
+    
+    if links:
+        try:
+            for link in links:
+    app.send_message(message.chat.id, link)
+    app.delete_messages(message.chat.id, [message.id])
+         except Exception as e:
+    app.send_message(message.chat.id, f"Failed to send bypassed links: {e}")
+    
+    #try: 
+       # final = []
+       # tmp = ""
+       # for ele in links.split("\n"):
+          #  tmp += ele + "\n\n"
+           # if len(tmp) > 4000:
+              #  final.append(tmp)
+              #  tmp = ""
+      #  final.append(tmp)
+     #   app.delete_messages(message.chat.id, msg.id)
+      #  tmsgid = message.id
+       # for ele in final:
+          #  tmsg = app.send_message(message.chat.id, f'__{ele}__',reply_to_message_id=tmsgid, disable_web_page_preview=True)
+          #  tmsgid = tmsg.id
+    #except Exception as e:
+      #  app.send_message(message.chat.id, f"__Failed to Bypass : {e}__", reply_to_message_id=message.id)
         
 
 
