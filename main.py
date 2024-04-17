@@ -87,15 +87,15 @@ def loopthread(message,otherss=False):
             app.delete_messages(message.chat.id,[msg.id])
             return
         except: pass
-    
     if links:
-        try:
-            for link in links:
+    try:
+        for link in links:
             app.send_message(message.chat.id, link)
-            app.delete_messages(message.chat.id, [message.id])
-        except Exception as e:
-            app.send_message(message.chat.id, f"Failed to send bypassed links: {e}")
-    
+        app.delete_messages(message.chat.id, [message.id])
+    except Exception as e:
+        app.send_message(message.chat.id, f"Failed to send bypassed links: {e}")
+
+
     #try: 
        # final = []
        # tmp = ""
