@@ -95,7 +95,6 @@ def loopthread(message,otherss=False):
     except Exception as e:
         app.send_message(message.chat.id, f"Failed to send bypassed links: {e}")
 
-
     #try: 
        # final = []
        # tmp = ""
