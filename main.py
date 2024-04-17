@@ -77,7 +77,7 @@ def loopthread(message,otherss=False):
             try: temp = bypasser.shortners(ele)
             except Exception as e: temp = "**Error**: " + str(e)
         print("bypassed:",temp)
-        if temp != None: links = links + temp + "\n"
+        if temp != None: links = links + temp + "\n\n"
     end = time()
     print("Took " + "{:.2f}".format(end-strt) + "sec")
 
@@ -88,30 +88,23 @@ def loopthread(message,otherss=False):
             return
         except: pass
     
-    if links:
-        try:
-            for link in links:
-                app.send_message(message.chat.id, link)
-            app.delete_messages(message.chat.id, [message.id])
-        except Exception as e:
-            app.send_message(message.chat.id, f"Failed to send bypassed links: {e}")
 
-    #try: 
-       # final = []
-       # tmp = ""
-       # for ele in links.split("\n"):
-          #  tmp += ele + "\n\n"
-           # if len(tmp) > 4000:
-              #  final.append(tmp)
-              #  tmp = ""
-      #  final.append(tmp)
-     #   app.delete_messages(message.chat.id, msg.id)
-      #  tmsgid = message.id
-       # for ele in final:
-          #  tmsg = app.send_message(message.chat.id, f'__{ele}__',reply_to_message_id=tmsgid, disable_web_page_preview=True)
-          #  tmsgid = tmsg.id
-    #except Exception as e:
-      #  app.send_message(message.chat.id, f"__Failed to Bypass : {e}__", reply_to_message_id=message.id)
+    try: 
+        final = []
+        tmp = ""
+        for ele in links.split("\n"):
+            tmp += ele + "\n\n"
+            if len(tmp) > 4000:
+                final.append(tmp)
+                tmp = ""
+        final.append(tmp)
+        app.delete_messages(message.chat.id, msg.id)
+        tmsgid = message.id
+        for ele in final:
+            tmsg = app.send_message(message.chat.id, f'__{links}__',reply_to_message_id=tmsgid, disable_web_page_preview=True)
+            tmsgid = tmsg.id
+    except Exception as e:
+        app.send_message(message.chat.id, f"__Failed to Bypass : {e}__", reply_to_message_id=message.id)
         
 
 
