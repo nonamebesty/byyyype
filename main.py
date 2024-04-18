@@ -44,7 +44,7 @@ def loopthread(message):
 
     # Process each line individually
     for line in lines:
-        if "http" in line:
+        if "http" in line and line.strip():  # Check if the line contains an http link and is not just whitespace
             link = line.split()[-1]  # Assuming the link is the last part of the line
             caption = " ".join(line.split()[:-1])  # The rest is caption
             try:
@@ -58,8 +58,8 @@ def loopthread(message):
                 bypassed_link = f"Error: {str(e)}"
 
             results.append(f"{caption}\n{bypassed_link}\n")
-        else:
-            results.append(f"{line}\nNo link found.\n")
+        elif line.strip():  # Only add lines that are not empty
+            results.append(line)
 
     # Delete the processing message
     app.delete_messages(message.chat.id, processing_message.id)
