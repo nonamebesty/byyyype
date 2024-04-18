@@ -58,8 +58,8 @@ def loopthread(message):
                 bypassed_link = f"Error: {str(e)}"
 
             results.append(f"{caption}\n{bypassed_link}\n")
-        elif line.strip():  # Only add lines that are not empty
-            results.append(line)
+        else:
+            results.append(line)  # Include empty and non-empty lines as they are
 
     # Delete the processing message
     app.delete_messages(message.chat.id, processing_message.id)
