@@ -51,7 +51,7 @@ def loopthread(message):
         if "http" in line and line.strip():  # Check if the line contains an http link and is not just whitespace
             link = line.split()[-1]  # Assuming the link is the last part of the line
             caption = " ".join(line.split()[:-1])  # The rest is caption
-            try:,
+            try:
                 if bypasser.ispresent(bypasser.ddl.ddllist, link):
                     bypassed_link = bypasser.ddl.direct_link_generator(link)
                 elif freewall.pass_paywall(link, check=True):
