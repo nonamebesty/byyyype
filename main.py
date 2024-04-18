@@ -50,17 +50,8 @@ def loopthread(message, otherss=False):
     if len(urls) == 0:
         return
 
-    if bypasser.ispresent(bypasser.ddl.ddllist, urls[0]):
-        msg = app.send_message(message.chat.id, "⚡ __generating...__", reply_to_message_id=message.id)
-    elif freewall.pass_paywall(urls[0], check=True):
-        msg = app.send_message(message.chat.id, "🕴️ __jumping the wall...__", reply_to_message_id=message.id)
-    else:
-        if "https://olamovies" in urls[0] or "https://psa.wf/" in urls[0]:
-            msg = app.send_message(message.chat.id, "⏳ __this might take some time...__", reply_to_message_id=message.id)
-        else:
-            msg = app.send_message(message.chat.id, "🔎 __bypassing...__", reply_to_message_id=message.id)
+    msg = app.send_message(message.chat.id, "🔎 __bypassing...__", reply_to_message_id=message.id)
 
-    strt = time()
     links = ""
     temp = None
     for ele in urls:
@@ -92,35 +83,14 @@ def loopthread(message, otherss=False):
         
         print("bypassed:", temp)
         if temp != None:
-            links = links + temp + "\n\n"
+            links += temp + "\n\n"
     
-    end = time()
-    print("Took " + "{:.2f}".format(end-strt) + "sec")
-
-    if otherss:
-        try:
-            app.send_photo(message.chat.id, message.photo.file_id, f'{texts}\n\n{links}', reply_to_message_id=message.id)
-            app.delete_messages(message.chat.id, [msg.id])
-            return
-        except:
-            pass
-    
-    try:
-        final = []
-        tmp = ""
-        for ele in links.split("\n"):
-            tmp += ele + "\n\n"
-            if len(tmp) > 4000:
-                final.append(tmp)
-                tmp = ""
-        final.append(tmp)
-        app.delete_messages(message.chat.id, msg.id)
-        tmsgid = message.id
-        for ele in final:
-            tmsg = app.send_message(message.chat.id, f'{texts}\n\n{ele}', reply_to_message_id=tmsgid, disable_web_page_preview=True)
-            tmsgid = tmsg.id
-    except Exception as e:
-        app.send_message(message.chat.id, f"__Failed to Bypass : {e}__", reply_to_message_id=message.id)
+    app.delete_messages(message.chat.id, msg.id)
+    final_message = f"{texts}\n\n{links}"
+    if len(final_message) > 4096:
+        app.send_message(message.chat.id, f"⚠️ The message is too long to be sent. Try sending fewer links.", reply_to_message_id=message.id)
+    else:
+        app.send_message(message.chat.id, final_message, reply_to_message_id=message.id, disable_web_page_preview=True)
 
 
 # start command
