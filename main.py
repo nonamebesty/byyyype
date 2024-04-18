@@ -58,14 +58,19 @@ def loopthread(message):
         return
 
     # Bypassing the links
+    bypassed_links = []
     for url in urls:
         try:
             bypassed_link = bypasser.shortners(url)
             if bypassed_link is not None:
-                for i, (caption, links) in enumerate(captions_with_links):
-                    captions_with_links[i] = (caption, links + [bypassed_link])
+                bypassed_links.append(bypassed_link)
         except Exception as e:
             print("Error bypassing link:", e)
+    
+    # Assigning each bypassed link to its corresponding caption
+    for i, (_, links) in enumerate(captions_with_links):
+        captions_with_links[i] = (captions_with_links[i][0], bypassed_links[:len(links)])
+        bypassed_links = bypassed_links[len(links):]
     
     # Constructing the final message with input captions and corresponding bypassed links
     final_message = ""
@@ -77,7 +82,6 @@ def loopthread(message):
 
     # Sending the final message
     app.send_message(message.chat.id, final_message, disable_web_page_preview=True)
-
 
 # start command
 @app.on_message(filters.command(["start"]))
