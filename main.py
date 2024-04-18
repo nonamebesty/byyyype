@@ -31,19 +31,26 @@ def handleIndex(ele,message,msg):
 
 
 # loop thread
-def loopthread(message,otherss=False):
+# loop thread
+def loopthread(message, otherss=False):
 
     urls = []
-    if otherss: texts = message.caption
-    else: texts = message.text
+    if otherss:
+        texts = message.caption
+    else:
+        texts = message.text
 
-    if texts in [None,""]: return
+    if texts in [None, ""]:
+        return
+    
     for ele in texts.split():
         if "http://" in ele or "https://" in ele:
             urls.append(ele)
-    if len(urls) == 0: return
+    
+    if len(urls) == 0:
+        return
 
-    if bypasser.ispresent(bypasser.ddl.ddllist,urls[0]):
+    if bypasser.ispresent(bypasser.ddl.ddllist, urls[0]):
         msg = app.send_message(message.chat.id, "⚡ __generating...__", reply_to_message_id=message.id)
     elif freewall.pass_paywall(urls[0], check=True):
         msg = app.send_message(message.chat.id, "🕴️ __jumping the wall...__", reply_to_message_id=message.id)
@@ -58,38 +65,47 @@ def loopthread(message,otherss=False):
     temp = None
     for ele in urls:
         if search(r"https?:\/\/(?:[\w.-]+)?\.\w+\/\d+:", ele):
-            handleIndex(ele,message,msg)
+            handleIndex(ele, message, msg)
             return
-        elif bypasser.ispresent(bypasser.ddl.ddllist,ele):
-            try: temp = bypasser.ddl.direct_link_generator(ele)
-            except Exception as e: temp = "**Error**: " + str(e)
+        elif bypasser.ispresent(bypasser.ddl.ddllist, ele):
+            try:
+                temp = bypasser.ddl.direct_link_generator(ele)
+            except Exception as e:
+                temp = "**Error**: " + str(e)
         elif freewall.pass_paywall(ele, check=True):
             freefile = freewall.pass_paywall(ele)
             if freefile:
-                try: 
-                    app.send_document(message.chat.id, freefile, reply_to_message_id=message.id)
+                try:
+                    app.send_document(message.chat.id, freefile, reply_to_message_id=message.id, caption=texts)
                     remove(freefile)
-                    app.delete_messages(message.chat.id,[msg.id])
+                    app.delete_messages(message.chat.id, [msg.id])
                     return
-                except: pass
-            else: app.send_message(message.chat.id, "__Failed to Jump", reply_to_message_id=message.id)
-        else:    
-            try: temp = bypasser.shortners(ele)
-            except Exception as e: temp = "**Error**: " + str(e)
-        print("bypassed:",temp)
-        if temp != None: links = links + temp + "\n\n"
+                except:
+                    pass
+            else:
+                app.send_message(message.chat.id, "__Failed to Jump", reply_to_message_id=message.id)
+        else:
+            try:
+                temp = bypasser.shortners(ele)
+            except Exception as e:
+                temp = "**Error**: " + str(e)
+        
+        print("bypassed:", temp)
+        if temp != None:
+            links = links + temp + "\n\n"
+    
     end = time()
     print("Took " + "{:.2f}".format(end-strt) + "sec")
 
     if otherss:
         try:
-            app.send_photo(message.chat.id, message.photo.file_id, f'__{links}__', reply_to_message_id=message.id)
-            app.delete_messages(message.chat.id,[msg.id])
+            app.send_photo(message.chat.id, message.photo.file_id, f'{texts}\n\n{links}', reply_to_message_id=message.id)
+            app.delete_messages(message.chat.id, [msg.id])
             return
-        except: pass
+        except:
+            pass
     
-
-    try: 
+    try:
         final = []
         tmp = ""
         for ele in links.split("\n"):
@@ -101,11 +117,10 @@ def loopthread(message,otherss=False):
         app.delete_messages(message.chat.id, msg.id)
         tmsgid = message.id
         for ele in final:
-            tmsg = app.send_message(message.chat.id, f'__{links}__',reply_to_message_id=tmsgid, disable_web_page_preview=True)
+            tmsg = app.send_message(message.chat.id, f'{texts}\n\n{ele}', reply_to_message_id=tmsgid, disable_web_page_preview=True)
             tmsgid = tmsg.id
     except Exception as e:
         app.send_message(message.chat.id, f"__Failed to Bypass : {e}__", reply_to_message_id=message.id)
-        
 
 
 # start command
