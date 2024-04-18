@@ -32,66 +32,44 @@ def handleIndex(ele,message,msg):
 
 # loop thread
 # loop thread
-def loopthread(message, otherss=False):
+def loopthread(message):
+    # Extracting caption text
+    caption_text = message.text
+    if caption_text is None:
+        caption_text = message.caption
 
-    urls = []
-    if otherss:
-        texts = message.caption
-    else:
-        texts = message.text
-
-    if texts in [None, ""]:
+    if caption_text is None:
+        app.send_message(message.chat.id, "⚠️ Please include a caption with the links.", reply_to_message_id=message.id)
         return
     
-    for ele in texts.split():
+    # Finding links in the caption text
+    urls = []
+    for ele in caption_text.split():
         if "http://" in ele or "https://" in ele:
             urls.append(ele)
     
     if len(urls) == 0:
+        app.send_message(message.chat.id, "⚠️ No valid links found in the caption.", reply_to_message_id=message.id)
         return
 
     msg = app.send_message(message.chat.id, "🔎 __bypassing...__", reply_to_message_id=message.id)
 
     links = ""
-    temp = None
     for ele in urls:
-        if search(r"https?:\/\/(?:[\w.-]+)?\.\w+\/\d+:", ele):
-            handleIndex(ele, message, msg)
-            return
-        elif bypasser.ispresent(bypasser.ddl.ddllist, ele):
-            try:
-                temp = bypasser.ddl.direct_link_generator(ele)
-            except Exception as e:
-                temp = "**Error**: " + str(e)
-        elif freewall.pass_paywall(ele, check=True):
-            freefile = freewall.pass_paywall(ele)
-            if freefile:
-                try:
-                    app.send_document(message.chat.id, freefile, reply_to_message_id=message.id, caption=texts)
-                    remove(freefile)
-                    app.delete_messages(message.chat.id, [msg.id])
-                    return
-                except:
-                    pass
-            else:
-                app.send_message(message.chat.id, "__Failed to Jump", reply_to_message_id=message.id)
-        else:
-            try:
-                temp = bypasser.shortners(ele)
-            except Exception as e:
-                temp = "**Error**: " + str(e)
-        
-        print("bypassed:", temp)
-        if temp != None:
-            links += temp + "\n\n"
+        try:
+            temp = bypasser.shortners(ele)
+            print("bypassed:", temp)
+            if temp is not None:
+                links += temp + "\n\n"
+        except Exception as e:
+            print("Error:", e)
     
     app.delete_messages(message.chat.id, msg.id)
-    final_message = f"{texts}\n\n{links}"
+    final_message = f"{caption_text}\n\n{links}"
     if len(final_message) > 4096:
         app.send_message(message.chat.id, f"⚠️ The message is too long to be sent. Try sending fewer links.", reply_to_message_id=message.id)
     else:
         app.send_message(message.chat.id, final_message, reply_to_message_id=message.id, disable_web_page_preview=True)
-
 
 # start command
 @app.on_message(filters.command(["start"]))
