@@ -44,32 +44,19 @@ def loopthread(message):
     
     # Finding links in the caption text
     urls = []
-    for ele in caption_text.split():
-        if "http://" in ele or "https://" in ele:
-            urls.append(ele)
+    for line in caption_text.split('\n'):
+        if line.strip().startswith("http"):
+            urls.append(line.strip())
     
     if len(urls) == 0:
         app.send_message(message.chat.id, "⚠️ No valid links found in the caption.", reply_to_message_id=message.id)
         return
 
-    msg = app.send_message(message.chat.id, "🔎 __bypassing...__", reply_to_message_id=message.id)
+    # Constructing the final message with links only
+    final_message = '\n'.join(urls)
 
-    links = ""
-    for ele in urls:
-        try:
-            temp = bypasser.shortners(ele)
-            print("bypassed:", temp)
-            if temp is not None:
-                links += temp + "\n\n"
-        except Exception as e:
-            print("Error:", e)
-    
-    app.delete_messages(message.chat.id, msg.id)
-    final_message = f"{caption_text}\n\n{links}"
-    if len(final_message) > 4096:
-        app.send_message(message.chat.id, f"⚠️ The message is too long to be sent. Try sending fewer links.", reply_to_message_id=message.id)
-    else:
-        app.send_message(message.chat.id, final_message, reply_to_message_id=message.id, disable_web_page_preview=True)
+    # Sending the final message
+    app.send_message(message.chat.id, final_message, reply_to_message_id=message.id, disable_web_page_preview=True)
 
 # start command
 @app.on_message(filters.command(["start"]))
