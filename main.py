@@ -44,26 +44,40 @@ def loopthread(message):
     
     # Finding links in the caption text
     urls = []
+    captions_with_links = []
+
     for line in caption_text.split('\n'):
         if line.strip().startswith("http"):
             urls.append(line.strip())
-    
+        else:
+            # If the line is not a link, store it as a caption
+            captions_with_links.append((line.strip(), []))
+
     if len(urls) == 0:
         app.send_message(message.chat.id, "⚠️ No valid links found in the caption.", reply_to_message_id=message.id)
         return
 
     # Bypassing the links
-    final_message = caption_text + "\n\nBypassed Links:\n"
     for url in urls:
         try:
             bypassed_link = bypasser.shortners(url)
             if bypassed_link is not None:
-                final_message += f"{bypassed_link}\n"
+                for i, (caption, links) in enumerate(captions_with_links):
+                    captions_with_links[i] = (caption, links + [bypassed_link])
         except Exception as e:
             print("Error bypassing link:", e)
     
+    # Constructing the final message with input captions and corresponding bypassed links
+    final_message = ""
+    for caption, links in captions_with_links:
+        final_message += f"Input Caption: {caption}\n\nOutput Links:\n"
+        for link in links:
+            final_message += f"{link}\n"
+        final_message += "\n"
+
     # Sending the final message
-    app.send_message(message.chat.id, final_message, reply_to_message_id=message.id, disable_web_page_preview=True)
+    app.send_message(message.chat.id, final_message, disable_web_page_preview=True)
+
 
 # start command
 @app.on_message(filters.command(["start"]))
