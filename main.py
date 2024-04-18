@@ -33,55 +33,46 @@ def handleIndex(ele,message,msg):
 # loop thread
 # loop thread
 def loopthread(message):
-    # Extracting caption text
-    caption_text = message.text
-    if caption_text is None:
-        caption_text = message.caption
-
-    if caption_text is None:
+    texts = message.text or message.caption
+    if not texts:
         app.send_message(message.chat.id, "⚠️ Please include a caption with the links.", reply_to_message_id=message.id)
         return
-    
-    # Finding links in the caption text
-    urls = []
-    captions_with_links = []
 
-    for line in caption_text.split('\n'):
-        if line.strip().startswith("http"):
-            urls.append(line.strip())
+    lines = texts.split("\n")
+    results = []
+    processing_message = app.send_message(message.chat.id, "Processing links...", reply_to_message_id=message.id)
+
+    # Process each line individually
+    for line in lines:
+        if "http" in line:
+            link = line.split()[-1]  # Assuming the link is the last part of the line
+            caption = " ".join(line.split()[:-1])  # The rest is caption
+            try:
+                if bypasser.ispresent(bypasser.ddl.ddllist, link):
+                    bypassed_link = bypasser.ddl.direct_link_generator(link)
+                elif freewall.pass_paywall(link, check=True):
+                    bypassed_link = freewall.pass_paywall(link) or "Failed to bypass"
+                else:
+                    bypassed_link = bypasser.shortners(link) or "Failed to bypass"
+            except Exception as e:
+                bypassed_link = f"Error: {str(e)}"
+
+            results.append(f"{caption}\n{bypassed_link}\n")
         else:
-            # If the line is not a link, store it as a caption
-            captions_with_links.append((line.strip(), []))
+            results.append(f"{line}\nNo link found.\n")
 
-    if len(urls) == 0:
-        app.send_message(message.chat.id, "⚠️ No valid links found in the caption.", reply_to_message_id=message.id)
-        return
+    # Delete the processing message
+    app.delete_messages(message.chat.id, processing_message.id)
 
-    # Bypassing the links
-    bypassed_links = []
-    for url in urls:
-        try:
-            bypassed_link = bypasser.shortners(url)
-            if bypassed_link is not None:
-                bypassed_links.append(bypassed_link)
-        except Exception as e:
-            print("Error bypassing link:", e)
-    
-    # Assigning each bypassed link to its corresponding caption
-    for i, (_, links) in enumerate(captions_with_links):
-        captions_with_links[i] = (captions_with_links[i][0], bypassed_links[:len(links)])
-        bypassed_links = bypassed_links[len(links):]
-    
-    # Constructing the final message with input captions and corresponding bypassed links
-    final_message = ""
-    for caption, links in captions_with_links:
-        final_message += f"Input Caption: {caption}\n\nOutput Links:\n"
-        for link in links:
-            final_message += f"{link}\n"
-        final_message += "\n"
+    # Send the result message
+    final_message = "\n".join(results)
+    app.send_message(message.chat.id, final_message, disable_web_page_preview=True, reply_to_message_id=message.id)
 
-    # Sending the final message
-    app.send_message(message.chat.id, final_message, disable_web_page_preview=True)
+# Handle text messages including those with photo captions
+@app.on_message(filters.text)
+def receive(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
+    bypass = Thread(target=lambda: loopthread(message), daemon=True)
+    bypass.start()
 
 # start command
 @app.on_message(filters.command(["start"]))
