@@ -57,7 +57,7 @@ def loopthread(message):
             except Exception as e:
                 bypassed_link = f"Error: {str(e)}"
 
-            results.append(f"{caption}\n{bypassed_link}\n")
+            results.append(f"<b>{caption}\n{bypassed_link}</b>")
         else:
             results.append(line)  # Include empty and non-empty lines as they are
 
