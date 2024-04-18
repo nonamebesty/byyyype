@@ -37,7 +37,11 @@ def loopthread(message):
     if not texts:
         app.send_message(message.chat.id, "⚠️ Please include a caption with the links.", reply_to_message_id=message.id)
         return
+    # Check if the message is a command
+    if texts.startswith('/'):
+        return  # Ignore command messages like /start, /help, etc.
 
+    
     lines = texts.split("\n")
     results = []
     processing_message = app.send_message(message.chat.id, "Processing links...", reply_to_message_id=message.id)
@@ -47,7 +51,7 @@ def loopthread(message):
         if "http" in line and line.strip():  # Check if the line contains an http link and is not just whitespace
             link = line.split()[-1]  # Assuming the link is the last part of the line
             caption = " ".join(line.split()[:-1])  # The rest is caption
-            try:
+            try:,
                 if bypasser.ispresent(bypasser.ddl.ddllist, link):
                     bypassed_link = bypasser.ddl.direct_link_generator(link)
                 elif freewall.pass_paywall(link, check=True):
