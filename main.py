@@ -38,31 +38,32 @@ def loopthread(message):
         app.send_message(message.chat.id, "⚠️ Please include a caption with the links.", reply_to_message_id=message.id)
         return
 
+    # Check if the message is a command
+    if texts.startswith('/'):
+        return  # Ignore command messages like /start, /help, etc.
+
     lines = texts.split("\n")
     results = []
     processing_message = app.send_message(message.chat.id, "Processing links...", reply_to_message_id=message.id)
 
     # Process each line individually
     for line in lines:
-        if "http" in line and any(ext in line for ext in [".com", ".net", ".org", ".in", ".us", ".co", ".info", ".link", ".io"]):  # More robust check for URLs
-            parts = line.rsplit(' ', 1)  # Split the line from the right at the first space to separate the link
-            if len(parts) == 2 and parts[1].startswith("http"):
-                link = parts[1]
-                caption = parts[0]
-                try:
-                    if bypasser.ispresent(bypasser.ddl.ddllist, link):
-                        bypassed_link = bypasser.ddl.direct_link_generator(link)
-                    elif freewall.pass_paywall(link, check=True):
-                        bypassed_link = freewall.pass_paywall(link) or "Failed to bypass"
-                    else:
-                        bypassed_link = bypasser.shortners(link) or "Failed to bypass"
-                except Exception as e:
-                    bypassed_link = f"Error: {str(e)}"
-                results.append(f"{caption}\n{bypassed_link}\n")
-            else:
-                results.append(line)  # The line doesn't end in a URL
+        if "http" in line and line.strip():  # Check if the line contains an http link and is not just whitespace
+            link = line.split()[-1]  # Assuming the link is the last part of the line
+            caption = " ".join(line.split()[:-1])  # The rest is caption
+            try:
+                if bypasser.ispresent(bypasser.ddl.ddllist, link):
+                    bypassed_link = bypasser.ddl.direct_link_generator(link)
+                elif freewall.pass_paywall(link, check=True):
+                    bypassed_link = freewall.pass_paywall(link) or "Failed to bypass"
+                else:
+                    bypassed_link = bypasser.shortners(link) or "Failed to bypass"
+            except Exception as e:
+                bypassed_link = f"Error: {str(e)}"
+
+            results.append(f"{caption}\n{bypassed_link}\n")
         else:
-            results.append(line)  # Include normal text lines as they are
+            results.append(line)  # Include empty and non-empty lines as they are
 
     # Delete the processing message
     app.delete_messages(message.chat.id, processing_message.id)
