@@ -406,11 +406,11 @@ def shortinglyclick(url):
 
 def gyanilinks(url):
     client = cloudscraper.create_scraper(allow_brotli=False)
-    DOMAIN = "https://golink.gyanitheme.com/"
+    DOMAIN = "https://go.bloggingaro.com/"
     url = url[:-1] if url[-1] == "/" else url
     code = url.split("/")[-1]
     final_url = f"{DOMAIN}/{code}"
-    ref = "https://tech.hipsonyc.com/"
+    ref = "https://hipsonyc.com/"
     h = {"referer": ref}
     resp = client.get(final_url, headers=h)
     soup = BeautifulSoup(resp.content, "html.parser")
