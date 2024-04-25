@@ -1,7 +1,7 @@
 {
-  #  "TOKEN": "",
-  #  "ID": "",
-   # "HASH": "",
+    "TOKEN": "","required": false
+    "ID": "","required": false
+    "HASH": "","required": false
     "Laravel_Session": "",
     "XSRF_TOKEN": "",
     "GDTot_Crypt": "",
