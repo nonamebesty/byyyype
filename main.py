@@ -75,7 +75,7 @@ def loopthread(message):
 # Handle text messages including those with photo captions
 @app.on_message(filters.text & (lambda m: not m.get('entities') or m.get('entities')[0].get('type') != 'bot_command'))
 def handle_text(client, message):
-    bypass = Thread(target=lambda: loopthread(message), daemon=True)
+    bypass = Thread(target=lambda: loopthread(message, True), daemon=True)
     bypass.start()
 
 # start command
