@@ -29,7 +29,11 @@ def handleIndex(ele,message,msg):
     except: pass
     for page in result: app.send_message(message.chat.id, page, reply_to_message_id=message.id, disable_web_page_preview=True)
 
-
+# Assuming loopthread is defined somewhere else
+def loopthread(message, flag):
+    # Your loopthread function implementation here
+    pass
+    
 # loop thread
 # loop thread
 def loopthread(message):
