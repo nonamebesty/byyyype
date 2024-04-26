@@ -73,8 +73,8 @@ def loopthread(message):
     app.send_message(message.chat.id, final_message, disable_web_page_preview=True, reply_to_message_id=message.id)
 
 # Handle text messages including those with photo captions
-@app.on_message(filters.text)
-def receive(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
+@app.on_message(filters.text & ~filters.command)
+def handle_text(client, message):
     bypass = Thread(target=lambda: loopthread(message), daemon=True)
     bypass.start()
 
