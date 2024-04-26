@@ -93,7 +93,7 @@ def loopthread(message,otherss=False):
         final = []
         tmp = ""
         for ele in links.split("\n"):
-            tmp += ele + "\n"
+            tmp += ele + "\n\n"
             if len(tmp) > 4000:
                 final.append(tmp)
                 tmp = ""
